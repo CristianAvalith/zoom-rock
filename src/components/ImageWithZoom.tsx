@@ -19,122 +19,124 @@ const ImageWithZoom = ({ imageName, wellName, setError }: Props) => {
   const theme = useTheme();
 
   useEffect(() => {
-    let viewer: any;
+    if (typeof window !== "undefined" && viewerRef.current) {
+      let viewer: any;
 
-    if (viewerRef.current) {
-      import("openseadragon").then((OpenSeadragonData) => {
-        viewer = OpenSeadragonData.default({
-          element: viewerRef.current!,
-          prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
-          tileSources: `${process.env.NEXT_PUBLIC_URL_BACKEND}/api/v1/rock/get-dzi?wellName=${wellName}&fileName=${imageName}`,
-          showNavigator: true,
-          crossOriginPolicy: "Anonymous",
-          gestureSettingsMouse: {
-            scrollToZoom: true,
-            clickToZoom: false,
-          },
-          zoomPerScroll: 1.2,
-          showNavigationControl: false,
-          showHomeControl: false,
-          showZoomControl: false,
-          showFullPageControl: false,
-          drawer: "canvas",
-        });
-
-        viewer.addHandler("open", () => {
-          api
-            .get(`/api/v1/rock/list-marks?rockName=${imageName}`)
-            .then((res) => {
-              if (Array.isArray(res.data.data.marks)) {
-                res.data.data.marks.forEach((mark: any) => {
-                  const marker = document.createElement("div");
-                  marker.style.width = "15px";
-                  marker.style.height = "15px";
-                  marker.style.background = "#C5CBBF";
-                  marker.style.borderRadius = "50%";
-                  marker.style.border = "3px solid #1F3D33";
-                  marker.style.position = "absolute";
-                  marker.style.cursor = "pointer";
-                  marker.style.pointerEvents = "auto";
-                  marker.style.zIndex = "1000";
-                  marker.title = mark.title || "";
-
-                  const innerDot = document.createElement("div");
-                  innerDot.style.width = "6px";
-                  innerDot.style.height = "6px";
-                  innerDot.style.background = "#1F3D33";
-                  innerDot.style.borderRadius = "50%";
-                  innerDot.style.margin = "auto";
-                  innerDot.style.position = "relative";
-                  innerDot.style.top = "50%";
-                  innerDot.style.transform = "translateY(-50%)";
-
-                  marker.appendChild(innerDot);
-
-                  viewer.addOverlay({
-                    element: marker,
-                    location: new OpenSeadragon.Point(mark.x, mark.y),
-                    placement: OpenSeadragon.Placement.CENTER,
-                    checkResize: false,
-                  });
-                });
-              }
-            })
-            .catch(() => {
-              setError(
-                "Error al cargar las marcas. Por favor reinicie el navegador."
-              );
-            });
-        });
-
-        viewer.addHandler("canvas-double-click", async (event: any) => {
-          const point = viewer.viewport.pointFromPixel(event.position);
-          const marker = document.createElement("div");
-          marker.style.width = "15px";
-          marker.style.height = "15px";
-          marker.style.background = "#C5CBBF";
-          marker.style.borderRadius = "50%";
-          marker.style.border = "3px solid #1F3D33";
-          marker.style.position = "absolute";
-          marker.title = `${point.x.toFixed(2)}, ${point.y.toFixed(2)}`;
-
-          const innerDot = document.createElement("div");
-          innerDot.style.width = "6px";
-          innerDot.style.height = "6px";
-          innerDot.style.background = "#1F3D33";
-          innerDot.style.borderRadius = "50%";
-          innerDot.style.margin = "auto";
-          innerDot.style.position = "relative";
-          innerDot.style.top = "50%";
-          innerDot.style.transform = "translateY(-50%)";
-
-          marker.appendChild(innerDot);
-
-          viewer.addOverlay({
-            element: marker,
-            location: point,
-            checkResize: false,
+      if (viewerRef.current) {
+        import("openseadragon").then((OpenSeadragonData) => {
+          viewer = OpenSeadragonData.default({
+            element: viewerRef.current!,
+            prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
+            tileSources: `${process.env.NEXT_PUBLIC_URL_BACKEND}/api/v1/rock/get-dzi?wellName=${wellName}&fileName=${imageName}`,
+            showNavigator: true,
+            crossOriginPolicy: "Anonymous",
+            gestureSettingsMouse: {
+              scrollToZoom: true,
+              clickToZoom: false,
+            },
+            zoomPerScroll: 1.2,
+            showNavigationControl: false,
+            showHomeControl: false,
+            showZoomControl: false,
+            showFullPageControl: false,
+            drawer: "canvas",
           });
-          api
-            .post(`/api/v1/rock/save-mark`, {
-              x: point.x,
-              y: point.y,
-              rockName: imageName,
-              title: `${point.x.toFixed(2)}, ${point.y.toFixed(2)}`,
-            })
-            .catch(() => {
-              setError("Error al crear la nueva marca.");
-            });
-        });
 
-        viewer.addHandler("tile-drawn", () => {
-          if (!osdViewer.current) {
-            osdViewer.current = viewer;
-          }
+          viewer.addHandler("open", () => {
+            api
+              .get(`/api/v1/rock/list-marks?rockName=${imageName}`)
+              .then((res) => {
+                if (Array.isArray(res.data.data.marks)) {
+                  res.data.data.marks.forEach((mark: any) => {
+                    const marker = document.createElement("div");
+                    marker.style.width = "15px";
+                    marker.style.height = "15px";
+                    marker.style.background = "#C5CBBF";
+                    marker.style.borderRadius = "50%";
+                    marker.style.border = "3px solid #1F3D33";
+                    marker.style.position = "absolute";
+                    marker.style.cursor = "pointer";
+                    marker.style.pointerEvents = "auto";
+                    marker.style.zIndex = "1000";
+                    marker.title = mark.title || "";
+
+                    const innerDot = document.createElement("div");
+                    innerDot.style.width = "6px";
+                    innerDot.style.height = "6px";
+                    innerDot.style.background = "#1F3D33";
+                    innerDot.style.borderRadius = "50%";
+                    innerDot.style.margin = "auto";
+                    innerDot.style.position = "relative";
+                    innerDot.style.top = "50%";
+                    innerDot.style.transform = "translateY(-50%)";
+
+                    marker.appendChild(innerDot);
+
+                    viewer.addOverlay({
+                      element: marker,
+                      location: new OpenSeadragon.Point(mark.x, mark.y),
+                      placement: OpenSeadragon.Placement.CENTER,
+                      checkResize: false,
+                    });
+                  });
+                }
+              })
+              .catch(() => {
+                setError(
+                  "Error al cargar las marcas. Por favor reinicie el navegador."
+                );
+              });
+          });
+
+          viewer.addHandler("canvas-double-click", async (event: any) => {
+            const point = viewer.viewport.pointFromPixel(event.position);
+            const marker = document.createElement("div");
+            marker.style.width = "15px";
+            marker.style.height = "15px";
+            marker.style.background = "#C5CBBF";
+            marker.style.borderRadius = "50%";
+            marker.style.border = "3px solid #1F3D33";
+            marker.style.position = "absolute";
+            marker.title = `${point.x.toFixed(2)}, ${point.y.toFixed(2)}`;
+
+            const innerDot = document.createElement("div");
+            innerDot.style.width = "6px";
+            innerDot.style.height = "6px";
+            innerDot.style.background = "#1F3D33";
+            innerDot.style.borderRadius = "50%";
+            innerDot.style.margin = "auto";
+            innerDot.style.position = "relative";
+            innerDot.style.top = "50%";
+            innerDot.style.transform = "translateY(-50%)";
+
+            marker.appendChild(innerDot);
+
+            viewer.addOverlay({
+              element: marker,
+              location: point,
+              checkResize: false,
+            });
+            api
+              .post(`/api/v1/rock/save-mark`, {
+                x: point.x,
+                y: point.y,
+                rockName: imageName,
+                title: `${point.x.toFixed(2)}, ${point.y.toFixed(2)}`,
+              })
+              .catch(() => {
+                setError("Error al crear la nueva marca.");
+              });
+          });
+
+          viewer.addHandler("tile-drawn", () => {
+            if (!osdViewer.current) {
+              osdViewer.current = viewer;
+            }
+          });
         });
-      });
+      }
     }
-  }, [imageName, wellName, setError]);
+  }, [imageName, setError, wellName]);
 
   const zoomIn = () => {
     osdViewer.current?.viewport.zoomBy(1.2);
@@ -150,6 +152,22 @@ const ImageWithZoom = ({ imageName, wellName, setError }: Props) => {
     osdViewer.current?.viewport.goHome();
   };
 
+  const toggleFullscreen = () => {
+    if (typeof document === "undefined") return; // Verifica si 'document' está disponible
+  
+    const element = viewerRef.current;
+    if (!element) return;
+  
+    if (!document.fullscreenElement) {
+      element
+        .requestFullscreen()
+        .catch((err) => {
+          console.error(`Error al entrar en fullscreen: ${err.message}`);
+        });
+    } else {
+      document.exitFullscreen();
+    }
+  };
   return (
     <div
       ref={viewerRef}
@@ -242,6 +260,7 @@ const ImageWithZoom = ({ imageName, wellName, setError }: Props) => {
         </button>
         <button
           className={styles.button}
+          onClick={toggleFullscreen}
           title="Pantalla completa"
           style={{
             backgroundColor:

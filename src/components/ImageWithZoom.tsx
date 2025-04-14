@@ -134,7 +134,7 @@ const ImageWithZoom = ({ imageName, wellName, setError }: Props) => {
         });
       });
     }
-  }, []);
+  }, [imageName, wellName, setError]);
 
   const zoomIn = () => {
     osdViewer.current?.viewport.zoomBy(1.2);
@@ -151,17 +151,17 @@ const ImageWithZoom = ({ imageName, wellName, setError }: Props) => {
   };
 
   const toggleFullscreen = () => {
-    if (typeof document === "undefined") return; // 🛡️ Protección anti servidor
-  
     const element = viewerRef.current;
     if (!element) return;
-  
-    if (!document.fullscreenElement) {
-      element.requestFullscreen().catch((err) => {
-        console.error(`Error al entrar en fullscreen: ${err.message}`);
-      });
-    } else {
-      document.exitFullscreen();
+
+    if (typeof document !== "undefined") {
+      if (!document.fullscreenElement) {
+        element.requestFullscreen().catch((err) => {
+          console.error(`Error al entrar en fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
     }
   };
 

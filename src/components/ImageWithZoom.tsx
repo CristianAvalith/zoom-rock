@@ -150,21 +150,6 @@ const ImageWithZoom = ({ imageName, wellName, setError }: Props) => {
     osdViewer.current?.viewport.goHome();
   };
 
-  const toggleFullscreen = () => {
-    const element = viewerRef.current;
-    if (!element) return;
-
-    if (typeof document !== "undefined") {
-      if (!document.fullscreenElement) {
-        element.requestFullscreen().catch((err) => {
-          console.error(`Error al entrar en fullscreen: ${err.message}`);
-        });
-      } else {
-        document.exitFullscreen();
-      }
-    }
-  };
-
   return (
     <div
       ref={viewerRef}
@@ -257,7 +242,6 @@ const ImageWithZoom = ({ imageName, wellName, setError }: Props) => {
         </button>
         <button
           className={styles.button}
-          onClick={toggleFullscreen}
           title="Pantalla completa"
           style={{
             backgroundColor:

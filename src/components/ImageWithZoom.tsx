@@ -151,9 +151,11 @@ const ImageWithZoom = ({ imageName, wellName, setError }: Props) => {
   };
 
   const toggleFullscreen = () => {
+    if (typeof document === "undefined") return; // 🛡️ Protección anti servidor
+  
     const element = viewerRef.current;
     if (!element) return;
-
+  
     if (!document.fullscreenElement) {
       element.requestFullscreen().catch((err) => {
         console.error(`Error al entrar en fullscreen: ${err.message}`);
